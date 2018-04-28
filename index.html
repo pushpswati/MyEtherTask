@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+
+	<link rel="stylesheet" type="text/css" href="main.css">
+
+	<script src="./bower_components/web3/dist/web3.min.js"></script>
+
+</head>
+
+<body>
+	<div class="container">
+
+		<h1>MyEther</h1>
+
+		<h2 id="Ether instructor"></h2>
+
+		<label for="name" class="col-lg-2 control-label">Enter Value</label>
+		<input id="name" type="text">
+
+
+		<button id="buttonAddValue">Add Value </button>
+		<button id="buttonUpdateValue">Update Value</button>
+
+		<label for="name" class="col-lg-2 control-label">Current Value</label>
+		<div id="currentValue"></div>
+
+
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+	<script>
+		var TEST_RPC_ENDPOINT = 'http://localhost:8545'; //update it from your local test rpc server address
+		var CONTRACT_ADDRESS = '0xcc490186a13e1be2abaa0e68973c651876356ee1'; //update it from your smart contract address
+		var ABI = [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "Add",
+				"type": "event"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"name": "newvalue",
+						"type": "uint256"
+					}
+				],
+				"name": "setAdd",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": false,
+				"inputs": [
+					{
+						"name": "val",
+						"type": "uint256"
+					}
+				],
+				"name": "UpdateValue",
+				"outputs": [],
+				"payable": false,
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"constant": true,
+				"inputs": [],
+				"name": "getValue",
+				"outputs": [
+					{
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"payable": false,
+				"stateMutability": "view",
+				"type": "function"
+			}
+		]
+
+		if (typeof web3 !== 'undefined') {
+			web3 = new Web3(web3.currentProvider);
+		} else {
+			// set the provider you want from Web3.providers
+			web3 = new Web3(new Web3.providers.HttpProvider(TEST_RPC_ENDPOINT));
+			web3.eth.defaultAccount = web3.eth.accounts[0];
+			var CoursetroContract = web3.eth.contract(ABI);
+
+			var Coursetro = CoursetroContract.at(CONTRACT_ADDRESS);
+
+			$("#buttonAddValue").click(function () {
+				var name = $("#name").val();
+				name = Number(name);
+
+				Coursetro.setAdd(name);
+
+				updateCurrentValue();
+			});
+
+			$("#buttonUpdateValue").click(function () {
+				var name = $("#name").val();
+				name = Number(name);
+
+				Coursetro.UpdateValue(name);
+				updateCurrentValue();
+			});
+
+			function updateCurrentValue() {
+				var update = Coursetro.getValue().toNumber();
+				$("#currentValue").text(update);
+			}
+		}
+	</script>
+
+</body>
+
+</html>
